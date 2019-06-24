@@ -20,24 +20,28 @@ class Board extends React.Component {
     );
   }
 
+  renderBoard(size) {
+    let index = 0;
+    let rows = [];
+    let cols = [];
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
+        cols.push(this.renderSquare(index));
+        index++;
+      }
+      rows.push(<div className="board-row">{cols}</div>);
+      cols = [];
+    }
+    console.log(rows.length);
+    console.log(rows[0]);
+    return rows;
+  }
+
   render() {
+    let board = this.renderBoard(3);
     return (
       <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+        {board}
       </div>
     );
   }
@@ -101,7 +105,7 @@ class Game extends React.Component {
     })
 
     let status;
-    if (winner) {
+  if (winner) {
       status = 'Winner: ' + winner;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
