@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import { get } from 'https';
 
 function Square(props) {
   return (
@@ -48,14 +49,20 @@ class Game extends React.Component {
     super(props);
     this.state = {
       history : [{
-        squares: Array(9).fill(null)
+        squares: Array(9).fill(null),
       }],
-      xIsNext: true
+      stepNumber: 0,
+      xIsNext: true,
     };
+
+    this.handleClick = this.handleClick.bind(this);
+    this.jumpTo = this.jumpTo.bind(this);
   }
 
   handleClick(i) {
-    const history = this.state.history;
+    console.log(i);
+
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
@@ -65,19 +72,27 @@ class Game extends React.Component {
     this.setState({
       history: history.concat([{
         squares: squares,
+        location: getPosition(i),
       }]),
+      stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
+    });
+  }
+
+  jumpTo(step) {
+    this.setState({
+      stepNumber: step,
+      xIsNext: (step % 2) === 0,
     });
   }
 
   render() {
     const history = this.state.history;
-    const current = history[history.length -1];
+    const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
-
     const moves = history.map((step, move) => {
       const desc = move ?
-        'Go to move #' + move : 'Go to game start';
+        `Go to move # ${move}, Location: ${history[move].location}` : 'Go to game start';
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
@@ -109,6 +124,13 @@ class Game extends React.Component {
   }
 }
 
+function getPosition(index) {
+  //3 = number of columns
+  let row = Math.floor(index / 3) + 1;
+  let col = (index % 3) + 1;
+  return `${row}, ${col}`;
+}
+
 // ========================================
 
 ReactDOM.render(
@@ -133,5 +155,6 @@ function calculateWinner(squares) {
       return squares[a];
     }
   }
+
   return null;
 }
