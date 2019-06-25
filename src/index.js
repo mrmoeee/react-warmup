@@ -4,7 +4,7 @@ import './index.css';
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button className={props.winning ? 'square winning-square' : 'square'} onClick={props.onClick}>
       {props.value}
     </button>
   )
@@ -12,11 +12,18 @@ function Square(props) {
 
 class Board extends React.Component {
   renderSquare(i) {
+    /* 
+      simple boolean can be used to determine if we have winningsquares
+      So that we can pass it down to square as a prop (not sure if best practice)
+    */
+    let winning = this.props.winningSquares && this.props.winningSquares.includes(i) ? true : false; 
+
     return (
       <Square
         key={i}
         value={this.props.squares[i]} 
         onClick={() => this.props.onClick(i)}
+        winning={winning}
       />
     );
   }
@@ -113,17 +120,18 @@ class Game extends React.Component {
 
     let status;
     if (winner) {
-      status = 'Winner: ' + winner;
+      status = 'Winner: ' + winner.winner;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
-
     return (
       <div className="game">
         <div className="game-board">
+          {/* board now has winningSquare prop */}
           <Board 
             squares={current.squares}
-            onClick={(i) => this.handleClick(i)}  
+            onClick={(i) => this.handleClick(i)}
+            winningSquares={winner ? winner.line : null}
           />
         </div>
         <div className="game-info">
@@ -134,7 +142,6 @@ class Game extends React.Component {
             <button onClick={this.toggleAscending}>
               {this.state.isAscending ? 'Descending' : 'Ascending'}
             </button>
-
           </div>
         </div>
       </div>
@@ -170,7 +177,10 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return ({
+        winner: squares[a],
+        line: lines[i]
+      });
     }
   }
 

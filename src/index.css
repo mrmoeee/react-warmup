@@ -48,3 +48,8 @@ ol, ul {
 .game-info {
   margin-left: 20px;
 }
+
+.winning-square {
+  color: white;
+  background-color: green;
+}
