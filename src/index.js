@@ -13,7 +13,8 @@ function Square(props) {
 class Board extends React.Component {
   renderSquare(i) {
     return (
-      <Square 
+      <Square
+        key={i}
         value={this.props.squares[i]} 
         onClick={() => this.props.onClick(i)}
       />
@@ -29,11 +30,10 @@ class Board extends React.Component {
         cols.push(this.renderSquare(index));
         index++;
       }
-      rows.push(<div className="board-row">{cols}</div>);
+      rows.push(<div key={i} className="board-row">{cols}</div>);
       cols = [];
     }
-    console.log(rows.length);
-    console.log(rows[0]);
+
     return rows;
   }
 
@@ -58,9 +58,9 @@ class Game extends React.Component {
       stepNumber: 0,
       xIsNext: true,
     };
-
     this.handleClick = this.handleClick.bind(this);
     this.jumpTo = this.jumpTo.bind(this);
+    this.toggleAscending = this.toggleAscending.bind(this);
   }
 
   handleClick(i) {
@@ -78,6 +78,7 @@ class Game extends React.Component {
       }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
+      isAscending: true,
     });
   }
 
@@ -86,6 +87,12 @@ class Game extends React.Component {
       stepNumber: step,
       xIsNext: (step % 2) === 0,
     });
+  }
+
+  toggleAscending() {
+    this.setState({
+      isAscending: !this.state.isAscending,
+    })
   }
 
   render() {
@@ -105,7 +112,7 @@ class Game extends React.Component {
     })
 
     let status;
-  if (winner) {
+    if (winner) {
       status = 'Winner: ' + winner;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
@@ -121,7 +128,14 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <ol>{this.state.isAscending ? moves: moves.reverse()}</ol>
+          <div>
+            Sort by:
+            <button onClick={this.toggleAscending}>
+              {this.state.isAscending ? 'Descending' : 'Ascending'}
+            </button>
+
+          </div>
         </div>
       </div>
     );
